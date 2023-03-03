@@ -1,57 +1,52 @@
 package main
 
 import (
-	"flag"
 	"fmt"
-	"net"
+	"log"
+	"os"
 	"time"
+
+	"github.com/urfave/cli/v2"
 )
 
-const VERSION = "1.0.2"
-
-func getIP() string {
-	netInterfaces, err := net.Interfaces()
-	if err != nil {
-		return fmt.Sprint("net.Interfaces failed, err:", err.Error())
-	}
-
-	for i := 0; i < len(netInterfaces); i++ {
-		if (netInterfaces[i].Flags & net.FlagUp) != 0 {
-			addrs, _ := netInterfaces[i].Addrs()
-
-			for _, address := range addrs {
-				if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
-					if ipnet.IP.To4() != nil {
-						return fmt.Sprint(ipnet.IP.String())
-					}
-				}
-			}
-		}
-	}
-	return ""
-}
+// 定义版本号为2.0.0，表示重大改变
+const VERSION = "v2.0.0"
 
 func main() {
-	// var showVersion bool
-	// var showDate bool
-	// var showIP bool
-	var showVersion, showDate, showIP bool
-
-	flag.BoolVar(&showVersion, "v", false, "查看版本")
-	flag.BoolVar(&showDate, "d", false, "查看日期")
-	flag.BoolVar(&showIP, "ip", false, "查看本地IP")
-
-	flag.Parse()
-
-	if showVersion {
-		fmt.Println(VERSION)
+	// 输出应用的版本信息
+	cli.VersionFlag = &cli.BoolFlag{
+		Name:    "version",
+		Aliases: []string{"v", "V"},
+		Usage:   "print the version",
 	}
 
-	if showDate {
-		fmt.Println(time.Now().Format("2006-01-02 15:04:05")) //2006-01-02 15:04:05据说是golang的诞生时间，固定写法
+	app := &cli.App{
+		Name:    "go-cli", //应用名称
+		Version: VERSION,  //应用版本
+		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:    "date",
+				Aliases: []string{"d", "D"},       //别名
+				Usage:   "print the current date", //帮助信息
+			},
+		},
+		Action: func(c *cli.Context) error {
+			if c.Bool("date") {
+				fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
+			}
+			return nil
+		},
+
+		//定义作者信息
+		Authors: []*cli.Author{
+			{
+				Name:  "pengjielee",
+				Email: "386276251@qq.com",
+			},
+		},
 	}
 
-	if showIP {
-		fmt.Println(getIP())
+	if err := app.Run(os.Args); err != nil {
+		log.Fatal(err)
 	}
 }
