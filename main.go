@@ -32,9 +32,10 @@ func getIP() string {
 }
 
 func main() {
-	var showVersion bool
-	var showDate bool
-	var showIP bool
+	// var showVersion bool
+	// var showDate bool
+	// var showIP bool
+	var showVersion, showDate, showIP bool
 
 	flag.BoolVar(&showVersion, "v", false, "查看版本")
 	flag.BoolVar(&showDate, "d", false, "查看日期")
